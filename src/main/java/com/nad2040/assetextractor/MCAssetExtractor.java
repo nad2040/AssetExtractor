@@ -15,9 +15,9 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class MCAssetExtractor {
-    public static String assets_directory;
-    public static File indexes_directory;
-    public static String objects_directory;
+    public static Path assets_directory;
+    public static File indexes_directory; // use File instead of Path to sort indexes by last modified
+    public static Path objects_directory;
     public static File index;
     public static final String USER_HOME = System.getProperty("user.home");
 
@@ -34,13 +34,13 @@ public class MCAssetExtractor {
         String searchTerm = new Scanner(System.in).next();
 
         for (String filename : assets.getKeys()) {
-            filename = filename.replace('/', File.separatorChar);
             if (filename.contains(searchTerm)) {
+                filename = filename.replace('/', File.separatorChar);
                 Assets.FileInfo fileInfo = assets.get(filename);
-                Path hashfilepath = Path.of(objects_directory, fileInfo.hash.substring(0,2), fileInfo.hash);
+                Path hashfilepath = objects_directory.resolve(Path.of(fileInfo.hash.substring(0,2), fileInfo.hash));
                 Path target = Path.of(System.getProperty("user.dir"), filename);
                 Files.createDirectories(target.getParent());
-                System.out.println("Copying " + Path.of(assets_directory).relativize(hashfilepath) + " to " + filename + " ...");
+                System.out.println("Copying " + assets_directory.relativize(hashfilepath) + " to " + filename + " ...");
                 Files.copy(hashfilepath, target, StandardCopyOption.REPLACE_EXISTING);
             }
         }
@@ -48,13 +48,13 @@ public class MCAssetExtractor {
 
     public static void getAssetsDirectory() {
         assets_directory = switch (OSVersion.getOS()) {
-            case MAC -> USER_HOME + "/Library/Application Support/minecraft/assets";
-            case LINUX -> USER_HOME + "/.minecraft/assets";
-            case WINDOWS -> USER_HOME + "\\AppData\\Roaming\\.minecraft\\assets";
+            case MAC -> Path.of(USER_HOME,"Library","Application Support","minecraft","assets");
+            case LINUX -> Path.of(USER_HOME,".minecraft","assets");
+            case WINDOWS -> Path.of(USER_HOME,"AppData","Roaming",".minecraft","assets");
         };
         System.out.println("Found assets directory: " + assets_directory);
-        indexes_directory = new File(assets_directory, "indexes");
-        objects_directory = assets_directory + File.separator + "objects";
+        indexes_directory = new File(assets_directory.toString(), "indexes");
+        objects_directory = assets_directory.resolve("objects");
     }
 
     public static void getLastModifiedIndex() {
