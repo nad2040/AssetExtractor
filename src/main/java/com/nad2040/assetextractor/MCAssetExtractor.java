@@ -30,18 +30,21 @@ public class MCAssetExtractor {
         FileReader r = new FileReader(index);
         Assets assets = gson.fromJson(r,Assets.class);
 
-        System.out.print("Enter a search term: ");
-        String searchTerm = new Scanner(System.in).next();
+        String searchTerm = " ";
+        while (!searchTerm.equals("!quit")) {
+            System.out.print("Enter a search term or '!quit' to exit: ");
+            searchTerm = new Scanner(System.in).next();
 
-        for (String filename : assets.getKeys()) {
-            if (filename.contains(searchTerm)) {
-                filename = filename.replace('/', File.separatorChar);
-                Assets.FileInfo fileInfo = assets.get(filename);
-                Path hashfilepath = objects_directory.resolve(Path.of(fileInfo.hash.substring(0,2), fileInfo.hash));
-                Path target = Path.of(System.getProperty("user.dir"), filename);
-                Files.createDirectories(target.getParent());
-                System.out.println("Copying " + assets_directory.relativize(hashfilepath) + " to " + filename + " ...");
-                Files.copy(hashfilepath, target, StandardCopyOption.REPLACE_EXISTING);
+            for (String filename : assets.getKeys()) {
+                if (filename.contains(searchTerm)) {
+                    filename = filename.replace('/', File.separatorChar);
+                    Assets.FileInfo fileInfo = assets.get(filename);
+                    Path hashfilepath = objects_directory.resolve(Path.of(fileInfo.hash.substring(0,2), fileInfo.hash));
+                    Path target = Path.of(System.getProperty("user.dir"), filename);
+                    Files.createDirectories(target.getParent());
+                    System.out.println("Copying " + assets_directory.relativize(hashfilepath) + " to " + filename + " ...");
+                    Files.copy(hashfilepath, target, StandardCopyOption.REPLACE_EXISTING);
+                }
             }
         }
     }
@@ -63,9 +66,9 @@ public class MCAssetExtractor {
             assert files != null;
             Optional<File> opFile = Arrays.stream(files).max(Comparator.comparingLong(File::lastModified));
             opFile.ifPresent(file -> {
-                index = file;
-                System.out.println("Selecting most recent index file: " + index.getPath());
-            });
+                    index = file;
+                    System.out.println("Selecting most recent index file: " + index.getPath());
+                    });
         }
     }
 }
