@@ -20,6 +20,8 @@ type `music` or `fire` when prompted for a search term.
 You can use a `/` to make sure the search term isn't a substring of a larger word,
 like `fire` could be part of `fireworks`.
 
+https://user-images.githubusercontent.com/58147198/170807483-b8946c7a-3eb1-4857-a21b-5c2ae25b5739.mov
+
 ## Notice
 This application does not distribute any minecraft assets for free!
 
